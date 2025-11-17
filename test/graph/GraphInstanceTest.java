@@ -109,7 +109,7 @@ public abstract class GraphInstanceTest {
         Set<String> vs = g.vertices();
         try {
             vs.add("B");
-            fail("vertices set should be immutable or graph should not be affected");
+            assertEquals("B should not be added to the actual graph from vertices set", Set.of("A"), g.vertices());
         } catch (UnsupportedOperationException e) {
             // intended behavior
         }
