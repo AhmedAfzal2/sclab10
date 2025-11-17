@@ -6,6 +6,8 @@ package graph;
 import static org.junit.Assert.*;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -18,10 +20,6 @@ import org.junit.Test;
  * Your tests MUST NOT refer to specific concrete implementations.
  */
 public abstract class GraphInstanceTest {
-    
-    // Testing strategy
-    //   TODO
-    
     /**
      * Overridden by implementation-specific test classes.
      * 
@@ -36,11 +34,86 @@ public abstract class GraphInstanceTest {
     
     @Test
     public void testInitialVerticesEmpty() {
-        // TODO you may use, change, or remove this test
         assertEquals("expected new graph to have no vertices",
                 Collections.emptySet(), emptyInstance().vertices());
     }
-    
-    // TODO other tests for instance methods of Graph
-    
+
+    @Test
+    public void testAddVertex() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        assertEquals(Set.of("A"), g.vertices());
+        g.add("B");
+        assertEquals(Set.of("A","B"), g.vertices());
+    }
+
+    @Test
+    public void testAddDuplicateVertex() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        boolean addedAgain = g.add("A");
+        assertFalse("adding duplicate vertex should return false", addedAgain);
+        assertEquals(Set.of("A"), g.vertices());
+    }
+
+    // also tests getting target and sources of edge
+    @Test
+    public void testAddEdge() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        g.add("B");
+        g.set("A","B",3);
+        assertEquals(Map.of("B",3), g.targets("A"));
+        assertEquals(Map.of("A",3), g.sources("B"));
+    }
+
+    @Test
+    public void testUpdateEdgeWeight() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        g.add("B");
+        g.set("A","B",3);
+        g.set("A","B",5);
+        assertEquals(Map.of("B",5), g.targets("A"));
+        assertEquals(Map.of("A",5), g.sources("B"));
+    }
+
+    @Test
+    public void testRemoveEdge() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        g.add("B");
+        g.set("A","B",3);
+        // the specification of set() says it will remove the edge if weight is 0
+        g.set("A","B",0);
+        assertTrue(g.targets("A").isEmpty());
+        assertTrue(g.sources("B").isEmpty());
+    }
+
+    @Test
+    public void testRemoveVertex() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        g.add("B");
+        g.set("A","B",3);
+        g.remove("B");
+        assertFalse(g.vertices().contains("B"));
+        assertTrue(g.targets("A").isEmpty());
+        assertTrue(g.sources("B").isEmpty());
+    }
+
+    @Test
+    public void testVerticesListImmutable() {
+        Graph<String> g = emptyInstance();
+        g.add("A");
+        Set<String> vs = g.vertices();
+        try {
+            vs.add("B");
+            fail("vertices set should be immutable or graph should not be affected");
+        } catch (UnsupportedOperationException e) {
+            // intended behavior
+        }
+        assertFalse(g.vertices().contains("B"));
+    }
+
 }
